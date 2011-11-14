@@ -1,0 +1,11 @@
+Contentreich Alfresco Repository Sandbox
+
+Features
+
+_ Unobstrusive Spring Beans Performance Analysis leveraging Spring AOP and Perf4J.
+ 
+ 
+Install
+
+_ mvn package
+_ install amp file

@@ -1,0 +1,7 @@
+<webscript>
+  <shortname>contentreich perf4j graph</shortname>
+  <description>Contentreich Perf4J Graph</description>
+  <url>/contentreich/instrumentation/perf4jgraph</url>
+  <url>/contentreich/instrumentation/perf4jgraph/{graph_name}</url>
+  <authentication>admin</authentication>
+</webscript>
