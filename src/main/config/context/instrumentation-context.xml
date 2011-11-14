@@ -1,0 +1,49 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+						http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd">
+
+	<bean id="springBeansHelper" class="de.contentreich.alfresco.instrumentation.AlfrescoSpringBeansHelper"/>
+
+	<bean id="log4JHierarchyInit" class="de.contentreich.alfresco.Log4JRepoHierarchyInit" init-method="init">
+        <property name="extraLog4jUrls">
+            <list>
+                <!-- NOTE: value entries are listed from lowest precedence to highest.  -->
+                <!--  Installed  AMP modules  -->
+                <value>classpath*:alfresco/module/*/log4j.properties</value>
+                <!--  Enterprise extensions  -->
+                <value>classpath*:alfresco/enterprise/*-log4j.properties</value>
+                <!--  Other installed extensions  -->
+                <value>classpath*:alfresco/extension/*-log4j.properties</value>
+                <!--  private developer overrides -->
+                <value>classpath*:alfresco/extension/dev-log4j.properties</value>
+            </list>
+        </property>
+        <property name="extraLog4jXmlUrls">
+            <list>
+                <!-- NOTE: value entries are listed from lowest precedence to highest.  -->
+                <!--  Installed  AMP modules  -->
+                <value>classpath*:alfresco/module/*/log4j.xml</value>
+                <!--  Enterprise extensions  -->
+                <value>classpath*:alfresco/enterprise/*-log4j.xml</value>
+                <!--  Other installed extensions  -->
+                <value>classpath*:alfresco/extension/*-log4j.xml</value>
+	            <!-- private developer overrides -->
+                <value>classpath*:alfresco/extension/dev-log4j.xml</value>
+            </list>
+        </property>
+	</bean>
+
+    <bean id="webscript.de.contentreich.instrumentation.springbeans.get"
+          class="de.contentreich.alfresco.webscripts.SpringBeansWebScript"
+          parent="webscript">
+          <property name="springBeansHelper" ref="springBeansHelper"/>
+    </bean>
+    <bean id="webscript.de.contentreich.instrumentation.perf4jgraph.get"
+          class="de.contentreich.alfresco.webscripts.Perf4JGraphWebScript"
+          parent="webscript">
+    </bean>
+
+  <bean id="myLog4jHierarchy" class="org.apache.log4j.jmx.HierarchyDynamicMBean"/>
+</beans>

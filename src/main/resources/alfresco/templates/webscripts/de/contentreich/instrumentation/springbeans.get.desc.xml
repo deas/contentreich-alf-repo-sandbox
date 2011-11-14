@@ -1,0 +1,7 @@
+<webscript>
+  <shortname>contentreich beans instrumentation</shortname>
+  <description>Contentreich Spring Beans instrumentation</description>
+  <url>/contentreich/instrumentation/beans</url>
+  <url>/contentreich/instrumentation/beans/{bean_path}</url>
+  <authentication>admin</authentication>
+</webscript>
