@@ -1,0 +1,37 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+						http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd">
+		<!-- Dont use ...
+		<import resource="classpath:org/springframework/extensions/webscripts/groovy-webscripts-context.xml"/>
+	     does not work-->
+        <!-- Register the Groovy script processor -->
+        <!-- Beware of bean id - addon shipped context overrides ! -->
+        <bean id="webscripts.registrar.groovyscriptprocessor.gotcha" class="org.springframework.extensions.webscripts.ScriptProcessorRegistrar" init-method="init">
+        	<property name="registry" ref="webscripts.repo.registry.scriptprocessor"/>
+            <property name="factory">
+            	<bean class="org.springframework.extensions.webscripts.processor.GroovyScriptProcessorFactory" />
+            </property>
+	        <property name="name">
+    	        <value>Groovy Script Processor</value>
+        	</property>
+        	<property name="extension">
+            	<value>groovy</value>
+        	</property>
+        </bean>
+
+        <!-- Register the Groovy template processor -->
+        <!--                                                                                                                                                                                                         
+        <bean id="webscripts.registrar.groovytemplateprocessor" class="org.springframework.extensions.webscripts.TemplateProcessorRegistrar" init-method="init">                                                     
+                <property name="factory">                                                                                                                                                                            
+                        <bean class="org.springframework.extensions.webscripts.processor.GroovyTemplateProcessorFactory">                                                                                            
+                                <property name="defaultEncoding"><value>UTF-8</value></property>                                                                                                                     
+                                <property name="scriptProcessorFactory">                                                                                                                                             
+                                        <bean class="org.springframework.extensions.webscripts.processor.GroovyScriptProcessorFactory" />                                                                            
+                                </property>                                                                                                                                                                          
+                        </bean>                                                                                                                                                                                      
+                </property>                                                                                                                                                                                          
+        </bean>                                                                                                                                                                                                      
+        -->
+</beans>
