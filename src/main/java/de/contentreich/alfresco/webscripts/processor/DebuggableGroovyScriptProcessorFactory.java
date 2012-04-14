@@ -26,7 +26,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.alfresco.processor.ProcessorExtension;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -54,7 +53,7 @@ public class DebuggableGroovyScriptProcessorFactory extends
 	public void afterPropertiesSet() throws Exception {
 		if (this.ripOffRepoScriptProcessor != null) {
 			this.otherProcessorExtensions = new HashMap<String, Object>();
-			log.debug("Ripping of a "
+			log.debug("Ripping off a "
 					+ this.ripOffRepoScriptProcessor.getClass().getName());
 			try {
 				Method gpe = this.ripOffRepoScriptProcessor.getClass()
@@ -69,7 +68,7 @@ public class DebuggableGroovyScriptProcessorFactory extends
 						String name = (String) gxn.invoke(pe, null);
 						this.otherProcessorExtensions.put(name, pe);
 					}
-					log.debug("Ripped of " + ripOffExtensions.size()
+					log.debug("Ripped off " + ripOffExtensions.size()
 							+ " alien extensions");
 				} else {
 					log.debug("Got null value for expected property processorExtensions");

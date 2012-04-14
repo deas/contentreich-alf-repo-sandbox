@@ -78,7 +78,6 @@ public class DebuggableGroovyScriptProcessor extends GroovyScriptProcessor {
 			Map<String, Object> model) {
 		String cp = scriptContent.getPathDescription().replaceFirst(
 				"classpath\\*{0,1}:", "");
-		cp = cp.replaceFirst("classpath\\*{0,1}:", "");
 		String filename = null;
 		InputStream is = null;
 		String pkg = null;
