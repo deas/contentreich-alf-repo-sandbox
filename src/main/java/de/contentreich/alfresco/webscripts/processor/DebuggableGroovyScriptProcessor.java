@@ -29,6 +29,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.SequenceInputStream;
 import java.io.Writer;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -38,21 +39,46 @@ import org.springframework.extensions.webscripts.ScriptContent;
 import org.springframework.extensions.webscripts.processor.GroovyScriptProcessor;
 
 public class DebuggableGroovyScriptProcessor extends GroovyScriptProcessor {
-	private static final Log log = LogFactory.getLog(DebuggableGroovyScriptProcessor.class);
+	private static final Log log = LogFactory
+			.getLog(DebuggableGroovyScriptProcessor.class);
+
 	private boolean prependPackage = false;
-	
+	private Map<String, Object> allProcessorExtensions;
+
+	public DebuggableGroovyScriptProcessor(
+			Map<String, Object> otherProcessorExtensions) {
+		this.allProcessorExtensions = new HashMap<String, Object>();
+		this.allProcessorExtensions.putAll(processorExtensions);
+		if (otherProcessorExtensions != null) {
+			for (String name : otherProcessorExtensions.keySet()) {
+				if (this.allProcessorExtensions.containsKey(name)) {
+					log.warn("Keeping my own extension " + name
+							+ " instead of using the alien version");
+				} else {
+					this.allProcessorExtensions.put(name,
+							otherProcessorExtensions.get(name));
+				}
+			}
+			log.debug(this.allProcessorExtensions.keySet().size() - processorExtensions.keySet().size() + " alien processor extensions added");
+		} else {
+			log.debug("No alien process extensions");
+		}
+	}
+
 	@Override
 	public ScriptContent findScript(String path) {
 		int i = path.indexOf(".groovy");
-		String groovyPath = path.substring(0, i).replaceAll("\\.","_") + ".groovy" ;
+		String groovyPath = path.substring(0, i).replaceAll("\\.", "_")
+				+ ".groovy";
 		return super.findScript(groovyPath);
 	}
 
 	@Override
-    public Object executeScript(ScriptContent scriptContent, Map<String, Object> model)
-    {
-		String cp = scriptContent.getPathDescription().replaceFirst("classpath\\*{0,1}:","");
-		cp = cp.replaceFirst("classpath\\*{0,1}:","");
+	public Object executeScript(ScriptContent scriptContent,
+			Map<String, Object> model) {
+		String cp = scriptContent.getPathDescription().replaceFirst(
+				"classpath\\*{0,1}:", "");
+		cp = cp.replaceFirst("classpath\\*{0,1}:", "");
 		String filename = null;
 		InputStream is = null;
 		String pkg = null;
@@ -61,22 +87,24 @@ public class DebuggableGroovyScriptProcessor extends GroovyScriptProcessor {
 			pkg = cp.substring(0, idx).replace('/', '.');
 			String imp = "package " + pkg + ";";
 			filename = cp.substring(idx + 1, cp.length());
-			is = new SequenceInputStream(new ByteArrayInputStream(imp.getBytes()), scriptContent.getInputStream());
+			is = new SequenceInputStream(new ByteArrayInputStream(
+					imp.getBytes()), scriptContent.getInputStream());
 		} else {
 			filename = (idx > -1) ? cp.substring(idx + 1, cp.length()) : cp;
 			is = scriptContent.getInputStream();
 		}
-		log.debug("Executing script with filename " + filename + ", setting package " + ((pkg != null) ? pkg : "(none)"));
+		log.debug("Executing script with filename " + filename
+				+ ", setting package " + ((pkg != null) ? pkg : "(none)"));
 		// scriptContent.getPathDescription()
 		// classpath*:alfresco/templates/webscripts/test/groovy1_get.groovy
-    	return executeGroovyScript(is, filename, null, model);
-    }
+		// getPr
+		return executeGroovyScript(is, filename, null, model);
+	}
 
 	// TODO : cache
-    private Object executeGroovyScript(InputStream is, String file, Writer out, Map<String, Object> model)
-    {
-        try
-        {
+	private Object executeGroovyScript(InputStream is, String file, Writer out,
+			Map<String, Object> model) {
+		try {
 			GroovyShell shell = new GroovyShell();
 			Script script = null;
 			if (file != null) {
@@ -85,20 +113,19 @@ public class DebuggableGroovyScriptProcessor extends GroovyScriptProcessor {
 				script = shell.parse(new InputStreamReader(is));
 			}
 			this.addProcessorModelExtensions(model);
-			
+
 			Binding binding = new Binding(model);
-			for(String name : processorExtensions.keySet())
-			{
-				binding.setProperty(name, processorExtensions.get(name));
-			}			
+			for (String name : this.allProcessorExtensions.keySet()) {
+				binding.setProperty(name, this.allProcessorExtensions.get(name));
+			}
 			binding.setProperty("out", out);
 			script.setBinding(binding);
-			
+
 			return script.run();
-        }
-        catch (Exception exception)
-        {
-            throw new ScriptException("Error executing groovy script", exception);
-        }
-    }
+		} catch (Exception exception) {
+			throw new ScriptException("Error executing groovy script",
+					exception);
+		}
+	}
+
 }

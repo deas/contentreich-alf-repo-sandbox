@@ -20,15 +20,66 @@
  */
 package de.contentreich.alfresco.webscripts.processor;
 
+import java.lang.reflect.Method;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
+import org.alfresco.processor.ProcessorExtension;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.extensions.webscripts.ScriptProcessor;
 import org.springframework.extensions.webscripts.processor.GroovyScriptProcessorFactory;
 
 public class DebuggableGroovyScriptProcessorFactory extends
-		GroovyScriptProcessorFactory {
+		GroovyScriptProcessorFactory implements InitializingBean {
+	private static final Log log = LogFactory
+			.getLog(DebuggableGroovyScriptProcessorFactory.class);
+
+	private Object ripOffRepoScriptProcessor = null;
+	private Map<String, Object> otherProcessorExtensions;
+
+	public void setRipOffRepoScriptProcessor(Object ripOffRepoScriptProcessor) {
+		this.ripOffRepoScriptProcessor = ripOffRepoScriptProcessor;
+	}
 
 	@Override
 	public ScriptProcessor newInstance() {
-		return new DebuggableGroovyScriptProcessor();
+		return new DebuggableGroovyScriptProcessor(otherProcessorExtensions);
 	}
-	
+
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		if (this.ripOffRepoScriptProcessor != null) {
+			this.otherProcessorExtensions = new HashMap<String, Object>();
+			log.debug("Ripping of a "
+					+ this.ripOffRepoScriptProcessor.getClass().getName());
+			try {
+				Method gpe = this.ripOffRepoScriptProcessor.getClass()
+						.getMethod("getProcessorExtensions", null);
+				Collection<Object> ripOffExtensions = (Collection<Object>) gpe
+						.invoke(this.ripOffRepoScriptProcessor, null);
+				if (ripOffExtensions != null) {
+					for (Iterator iterator = ripOffExtensions.iterator(); iterator
+							.hasNext();) {
+						Object pe = iterator.next();
+						Method gxn = pe.getClass().getMethod("getExtensionName", null);
+						String name = (String) gxn.invoke(pe, null);
+						this.otherProcessorExtensions.put(name, pe);
+					}
+					log.debug("Ripped of " + ripOffExtensions.size()
+							+ " alien extensions");
+				} else {
+					log.debug("Got null value for expected property processorExtensions");
+				}
+			} catch (Exception e) {
+				log.warn("Ugh : " + e.getMessage());
+			}
+		} else {
+			log.debug("No alien to rip of");
+		}
+	}
+
 }
