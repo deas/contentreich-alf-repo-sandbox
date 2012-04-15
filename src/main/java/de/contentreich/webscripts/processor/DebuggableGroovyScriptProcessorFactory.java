@@ -18,7 +18,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.contentreich.alfresco.webscripts.processor;
+package de.contentreich.webscripts.processor;
 
 import java.lang.reflect.Method;
 import java.util.Collection;

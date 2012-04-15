@@ -18,7 +18,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package de.contentreich.alfresco.webscripts.processor;
+package de.contentreich.webscripts.processor;
 
 import groovy.lang.Binding;
 import groovy.lang.GroovyShell;

@@ -11,12 +11,11 @@
         <bean id="webscripts.registrar.groovyscriptprocessor.gotcha" class="org.springframework.extensions.webscripts.ScriptProcessorRegistrar" init-method="init">
         	<property name="registry" ref="webscripts.repo.registry.scriptprocessor"/>
             <property name="factory">
-            	<bean class="de.contentreich.alfresco.webscripts.processor.DebuggableGroovyScriptProcessorFactory">
+            	<bean class="de.contentreich.webscripts.processor.DebuggableGroovyScriptProcessorFactory">
 		        	<property name="ripOffRepoScriptProcessor">
         				<ref bean="javaScriptProcessor"/>
 		        	</property>	
             	</bean>
-            	<!--bean class="org.springframework.extensions.webscripts.processor.GroovyScriptProcessorFactory" /-->
             </property>
 	        <property name="name">
     	        <value>Groovy Script Processor (Debuggable)</value>
