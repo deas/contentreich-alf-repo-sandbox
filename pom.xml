@@ -101,15 +101,32 @@
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.extensions.surf</groupId>
-			<artifactId>spring-webscripts-addon-groovy</artifactId>
+			<artifactId>spring-webscripts-addon-groovy-cr</artifactId>
 			<version>${spring.surf.version}</version>
 		</dependency>
+        <dependency>
+            <groupId>it.sk.spring.surf.clojure</groupId>
+            <artifactId>spring-webscripts-addon-clojure</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>it.sk.alfresco</groupId>
+            <artifactId>lambdalf-lib</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+        </dependency>
+    <dependency><!-- Workaround - leiningen seems to ignore provided scope -->
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-context</artifactId>
+<version>${spring.version}</version>
+<scope>provided</scope>
+    </dependency>
+
 		<!--  Override groovy addon deps -->
-		<dependency>
+		<!-- dependency>
 			<groupId>org.codehaus.groovy</groupId>
 			<artifactId>groovy-all</artifactId>
 			<version>1.8.6</version>
-		</dependency>
+		</dependency-->
 		<dependency>
 			<groupId>commons-beanutils</groupId>
 			<artifactId>commons-beanutils</artifactId>
@@ -120,27 +137,62 @@
 			<groupId>org.alfresco</groupId>
 			<artifactId>alfresco-core</artifactId>
 			<version>${alfresco.version}</version>
-			<classifier>community</classifier>
+			<classifier>${alfresco.edition}</classifier>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.alfresco</groupId>
 			<artifactId>alfresco-repository</artifactId>
 			<version>${alfresco.version}</version>
-			<classifier>community</classifier>
+			<classifier>${alfresco.edition}</classifier>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.alfresco</groupId>
 			<artifactId>alfresco-datamodel</artifactId>
 			<version>${alfresco.version}</version>
-			<classifier>community</classifier>
+			<classifier>${alfresco.edition}</classifier>
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>
+        <!-- scm>
+                <connection>scm:svn:http://domain.com/svn/trunk/</connection>
+                <developerConnection>scm:svn:https://${user.name}@domain.com/svn/trunk/</developerConnection>
+                <url>http://domain.com/svn/trunk/</url>
+        </scm-->
 
 	<build>
 		<plugins>
+            <!-- Needed for cross OS compatibility in acp/zip encoding -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>2.5</version>
+                <configuration>
+                    <encoding>UTF-8</encoding>
+                    <!-- By default as per http://code.google.com/p/maven-alfresco-archetypes/issues/detail?id=7 FTL are not filtered to avoid corruption.                      
+                        | This behavior can be relaxed (in case filtering is needed in the FTLs) by selecting which files are filtered and which not as described               
+                        | here http://code.google.com/p/maven-alfresco-archetypes/issues/detail?id=7#c3                                                                         
+                        -->
+                    <nonFilteredFileExtensions>
+                        <nonFilteredFileExtension>ftl</nonFilteredFileExtension>
+                    </nonFilteredFileExtensions>
+                </configuration>
+            </plugin>
+            <plugin>
+                                <artifactId>maven-nosnapshot-plugin</artifactId>
+                                <groupId>org.alfresco.maven</groupId>
+                                 <version>0.0.8</version>
+                                <executions>
+                                        <execution>
+                                                <id>default</id>
+                                                <phase>initialize</phase>
+                                                <goals>
+                                                        <goal>strip</goal>
+                                                </goals>
+                                        </execution>
+                                </executions>
+                        </plugin>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
@@ -151,7 +203,7 @@
 			<plugin>
 				<groupId>org.alfresco.maven.plugin</groupId>
 				<artifactId>maven-amp-plugin</artifactId>
-				<version>3.0.2</version>
+				<version>3.0.4</version><!-- 3.0.2 -->
 				<extensions>true</extensions>
 				<configuration>
 					<archive>
@@ -181,12 +233,94 @@
 				</excludes>
 			</resource>
 		</resources>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.eclipse.m2e</groupId>
+                    <artifactId>lifecycle-mapping</artifactId>
+                    <version>1.0.0</version>
+                    <configuration>
+                        <lifecycleMappingMetadata>
+                            <pluginExecutions>
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>org.apache.maven.plugins</groupId>
+                                        <artifactId>maven-dependency-plugin</artifactId>
+                                        <versionRange>[2.0,)</versionRange>
+                                        <goals>
+                                            <goal>copy-dependencies</goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <execute />
+                                    </action>
+                                </pluginExecution>
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>org.alfresco.maven</groupId>
+                                        <artifactId>maven-nosnapshot-plugin</artifactId>
+                                        <versionRange>[0.0,)</versionRange>
+                                        <goals>
+                                            <goal>strip</goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <ignore />
+                                    </action>
+                                </pluginExecution>
+                            </pluginExecutions>
+                        </lifecycleMappingMetadata>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
 	</build>
 	<properties>
+                <!--                                                                                                                                                        
+                        Default for which src/main/properties/<env>/alfresco-global.properties is                                                                           
+                        loaded. NB: used only for the 'test' profile (e.g. '-P test' on the                                                                                 
+                        mvn commandline) jetty run deployment, does not impact AMP behavior                                                                                 
+                        which is typically environment independent                                                                                                          
+                -->
+                <env>local</env>
+                <!-- Webapp used to test/develop locally the AMP -->
+                <webapp.name>${project.artifactId}-webapp</webapp.name><!-- ${project.artifactId}-webapp -->
+                <!--                                                                                                                                                        
+                        | | By default the src/test/properties/local/alfresco-global.properties                                                                             
+                        uses the property "alfresco.data.location" to specify where |                                                                                       
+                        alf_data gets created. | For local jetty:run deployment default                                                                                     
+                        creation dir is under project root folder (as location is specified                                                                                 
+                        relatively to run | dir). Please add alf_data_jetty in svn/cvs                                                                                      
+                        ignores in order not to commit that. You can also specified a                                                                                       
+                        different (out of the | sproject) folder | by editing the following                                                                                 
+                        properties. | DB is also configurable here. Of course keep in sync                                                                                  
+                        these two values otherwise you'll get integrity errors. | | Empty log                                                                               
+                        dir creates file alfresco.log in appserver default dir. You can also                                                                                
+                        specify a meaningful log directory for the server | (add a trailing                                                                                 
+                        slash, e.g. '/var/log/alfresco/' ) | | Jetty embedded run logs by                                                                                   
+                        default in target/alfresco.log                                                                                                                      
+                -->
+
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<alfresco.version>4.0.b</alfresco.version>
+		<alfresco.edition>community</alfresco.edition>
+		<!-- from 3.9.1 archetype 
+        <alfresco.data.location>./alf_data_jetty</alfresco.data.location>
+        <alfresco.db.name>alf_jetty</alfresco.db.name>
+        <alfresco.db.username>alfresco</alfresco.db.username>
+        <alfresco.db.password>alfresco</alfresco.db.password>
+        <alfresco.db.params>MODE=PostgreSQL;AUTO_SERVER=TRUE;DB_CLOSE_ON_EXIT=FALSE;LOCK_TIMEOUT=10000;MVCC=TRUE</alfresco.db.params>
+        <alfresco.db.url>jdbc:h2:${alfresco.data.location}/h2_data/${alfresco.db.name};${alfresco.db.params}</alfresco.db.url>
+        <alfresco.db.datasource.class>org.h2.jdbcx.JdbcDataSource</alfresco.db.datasource.class>
+		-->
 		<spring.version>3.0.5.RELEASE</spring.version>
 		<spring.surf.version>1.0.0</spring.surf.version>
+        <webapp.log.level>error</webapp.log.level>
+        <webapp.log.dir></webapp.log.dir>
+        <!--  End of testing webapp specific properties -->
+        <!--  Module specific build time properties -->
+        <module.log.level>debug</module.log.level>
 		<maven.test.skip>true</maven.test.skip>
 	</properties>
 
