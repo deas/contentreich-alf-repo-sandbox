@@ -6,7 +6,7 @@ https://github.com/mbostock/d3/wiki/Treemap-Layout#wiki-treemap
 <#macro process_entry entry>                                                                                                                                                       
 {
 "name" : "${entry.name}",
-"id" : "${entry.id]}",
+"id" : "${entry.id}",
 "sum" : ${entry.sum},
 <#if entry.children?has_content>
 "children" : [
