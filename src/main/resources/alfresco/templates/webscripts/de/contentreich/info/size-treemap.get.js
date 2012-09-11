@@ -10,7 +10,8 @@ function appendNode(folder)
 	for (var i=0; i < childFolders.length; i++) {
 		var child = appendNode(childFolders[i]);
 		children.push(child);
-		folderSum += child.sum; 
+		folderSum += child.folderSum; 
+		folderSum += child.contentSum; 
 	}
 
 	var childFiles = folder.childFileFolders(true, false);
@@ -18,19 +19,22 @@ function appendNode(folder)
 	for (var i=0; i < childFiles.length; i++) {
 		contentSum += childFiles[i].size;
 	}
-	/* Special child */
+	// Special child
+	/*
 	children.push({
 		sum: contentSum,
 		name: "",
 		id:"",
 		children:[]
 	});
+	*/
 	logger.log("Done " + folder.name + ", " + folder.nodeRef.id);
 	return {
 			id:folder.nodeRef.id,
 			name:folder.name,
 			children:children,
-			sum : folderSum + contentSum
+			folderSum : folderSum,
+			contentSum : contentSum
 	};
 }
 
