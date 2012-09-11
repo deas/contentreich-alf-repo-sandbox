@@ -7,7 +7,7 @@ https://github.com/mbostock/d3/wiki/Treemap-Layout#wiki-treemap
 {
 "name" : "${entry.name}",
 "id" : "${entry.id}",
-"sum" : ${entry.sum},
+"sum" : ${entry.sum?string("#")},
 <#if entry.children?has_content>
 "children" : [
 <#list entry.children as child>
