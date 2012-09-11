@@ -1,0 +1,12 @@
+<webscript>
+  <shortname>backup-index</shortname>
+  <description>
+  	Example : curl -uadmin:admin -d '{"coreClient":"search.alfrescoCoreSolrBackupClient", "location":"/tmp"}' -H "Content-Type: application/json" http://localhost:8080/alfresco/service/contentreich/misc/backup-index
+  	Valid core clients are : search.alfrescoCoreSolrBackupClient and search.archiveCoreSolrBackupClient 
+  	</description>
+  <url>/contentreich/misc/backup-index</url>
+  <format default="json"/>
+  <authentication>admin</authentication>
+</webscript>
+
+
