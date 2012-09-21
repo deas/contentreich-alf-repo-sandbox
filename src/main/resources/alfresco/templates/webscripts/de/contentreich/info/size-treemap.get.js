@@ -1,15 +1,18 @@
 // logger.log("xxx");
-function appendNode(folder)
+
+function appendNode(folder, depth, maxdepth)
 {
-	logger.log("Processing " + folder.name + ", " + folder.nodeRef.id);
+	logger.log("Processing " + folder.name + ", " + folder.nodeRef.id + ", depth = " + depth + ", maxdepth = " + maxdepth);
 	var folderSum = 0;
 	var contentSum = 0;
 	var childFolders = folder.childFileFolders(false, true);
 	var children = [];
 	
 	for (var i=0; i < childFolders.length; i++) {
-		var child = appendNode(childFolders[i]);
-		children.push(child);
+		var child = appendNode(childFolders[i], depth + 1, maxdepth);
+		if (depth <= maxdepth) {
+			children.push(child);
+		}
 		folderSum += child.folderSum; 
 		folderSum += child.contentSum; 
 	}
@@ -19,18 +22,10 @@ function appendNode(folder)
 	for (var i=0; i < childFiles.length; i++) {
 		contentSum += childFiles[i].size;
 	}
-	// Special child
-	/*
-	children.push({
-		sum: contentSum,
-		name: "",
-		id:"",
-		children:[]
-	});
-	*/
 	logger.log("Done " + folder.name + ", " + folder.nodeRef.id);
 	return {
 			id:folder.nodeRef.id,
+			depth: depth,
 			name:folder.name,
 			children:children,
 			folderSum : folderSum,
@@ -38,10 +33,13 @@ function appendNode(folder)
 	};
 }
 
-// var node = space;
-var node = search.findNode("workspace://SpacesStore/" + url.extension);
+var maxdepth = args['maxdepth'] ? args['maxdepth'] : 20;
+var nodeRef = "workspace://SpacesStore/" + url.extension;
+var node = search.findNode(nodeRef);
+
+logger.log("Create treemap for node " + nodeRef + ", maxdepth = " + maxdepth);
 // status.setCode(status.STATUS_BAD_REQUEST, "Invalid");
-model.node = appendNode(node);
+model.node = appendNode(node, 1, maxdepth);
 
 // return tree;
 // vom letzten Node parentId, parentName null setzen - s. google doku
