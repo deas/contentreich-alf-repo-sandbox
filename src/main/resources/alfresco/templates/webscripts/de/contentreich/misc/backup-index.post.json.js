@@ -1,6 +1,3 @@
-// WEB-INF/classes/alfresco/subsystems/Search/solr/solr-backup-context.xml
-// WEB-INF/classes/alfresco/subsystems/Search/solr/solr-backup.properties
-// solr.backup.alfresco.cronExpression
 /*
 solr.backup.alfresco.cronExpression=0 0 2 * * ?
 solr.backup.archive.cronExpression=0 0 4 * * ?
@@ -11,23 +8,56 @@ solr.backup.archive.remoteBackupLocation=
 solr.backup.alfresco.cronExpression=0 0 0 * * ? 2050
 solr.backup.archive.cronExpression=0 0 0 * * ? 2050
 
+lucene
+
+index.backup.cronExpression=0 0 0 * * ? 2050
 */
 
-var location = json.get("location");
-var coreClient = json.get("coreClient");
-// search.alfrescoCoreSolrBackupClient|search.archiveCoreSolrBackupClient
+var SOLR_INDICES = [ "alfresco", "archive" ];
+var LUCENE_COMPONENT = "search.luceneIndexBackupComponent";
+var LUCENE_BACKUP_DIR = "backup-lucene-indexes";
 
-logger.log("About to execute index backup with core client = " + coreClient + ", location = " + location);
-var client = Packages.org.springframework.web.context.ContextLoader.getCurrentWebApplicationContext().getBean("Search").getApplicationContext().getBean(coreClient);
-
-if (!client) {
-	status.code = 404;
-	status.message = "No client for core " + core + " not found";
-	status.redirect = true;
-} else {
-	if (location) {
-		client.remoteBackupLocation = location;// default is empty
+function backupSolrIndex(targetRootDir) {
+	logger.log("Executing solr backup");
+	for (var i=0; i<SOLR_INDICES.length; i++) {
+		var loc = targetRootDir + "/" + SOLR_INDICES[i];
+		var client = searchCtx.getBean("search." + SOLR_INDICES[i] + "CoreSolrBackupClient");
+		logger.log("Executing backup for core " + SOLR_INDICES[i] + " to " + loc);
+		client.remoteBackupLocation = targetRootDir + "/" + SOLR_INDICES[i];// default is empty 
+		client.execute();
 	}
-	logger.log("Executing index backup");
-	client.execute();
+}
+
+function backupLuceneIndex(targetRootDir) {
+	var loc = targetRootDir + "/" + LUCENE_BACKUP_DIR;
+	logger.log("Executing lucene backup to " + loc);
+	var component = searchCtx.getBean(LUCENE_COMPONENT);
+	component.targetLocation = loc;
+	component.backup();
+}
+
+function isLucene(searchCtx) {
+	var is = false;	
+	try {
+		searchCtx.getBean(LUCENE_COMPONENT);
+		is = true;
+	} catch (ex) {}
+	return is;
+}
+
+var searchCtx = Packages.org.springframework.web.context.ContextLoader.getCurrentWebApplicationContext().getBean("Search").getApplicationContext();
+
+var targetDirectory = json.get("targetDirectory");
+
+if (targetDirectory) {
+	if (isLucene(searchCtx)) {
+		backupLuceneIndex(targetDirectory);
+	} else {
+		backupSolrIndex(targetDirectory);
+	}	
+} else {
+	status.code = 404;
+	status.message = "Missing parameter " + targetDirectory;
+	status.redirect = true;
+	
 }
