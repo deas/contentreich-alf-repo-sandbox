@@ -72,9 +72,14 @@ public abstract class SpringBeansHelper implements ApplicationContextAware {
 				BeanDefinition def = beanFactory.getBeanDefinition(beanName);
 				if (!(def.isPrototype() || def.isLazyInit())) {
 					Object bean = appContext.getBean(beanName);
-					if (holdsChildApplicationContext(bean)) {
-						// Semantically not perfect but ok ;)
-						clazz = getApplicationContext(bean).getClass();
+					if (bean != null){
+						if (holdsChildApplicationContext(bean)) {
+							// Semantically not perfect but ok ;)
+							clazz = getApplicationContext(bean).getClass();
+						}
+					} else {
+						logger.warn("Bean for name " + beanName + " is null - skipping it");
+						continue;
 					}
 				}
 				String[] beanEntry = new String[] { beanName, clazz.getName(), parentId };

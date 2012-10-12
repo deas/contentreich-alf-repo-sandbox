@@ -23,4 +23,15 @@
 	<import resource="classpath:alfresco/module/de_contentreich_repo_sandbox/context/instrumentation-context.xml"/>
 	<import resource="classpath:alfresco/module/de_contentreich_repo_sandbox/context/groovy-webscripts-context.xml"/>
 	<import resource="classpath:alfresco/module/de_contentreich_repo_sandbox/context/clojure-webscripts-context.xml"/>
+	<!-- import resource="classpath:alfresco/module/${groupId}.${artifactId}/context/service-context.xml" /-->
+	<!-- 
+    <bean id="contentreich.sitetools.shareSiteAuditHelper" class="de.contentreich.alfresco.repo.audit.ShareSiteAuditHelper">
+   		<property name="auditService" ref="AuditService" />
+   		<property name="appName" value="km-site"/>
+    </bean>
+
+    <bean name="contentreich.sitetools.auditModel.extractor.siteValue" class="de.contentreich.alfresco.repo.audit.SiteNameDataExtractor">
+        <property name="registry" ref="auditModel.extractorRegistry" />
+    </bean>
+	-->
 </beans>

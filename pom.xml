@@ -42,7 +42,7 @@
 		<pluginRepository>
 			<id>alfresco-releases</id>
 			<name>Alfresco Public Releases Repository</name>
-			<url>http://maven.alfresco.com/nexus/content/repositories/releases/</url>
+			<url>https://artifacts.alfresco.com/nexus/content/groups/public/</url>
 		</pluginRepository>
 	</pluginRepositories>
 
@@ -76,6 +76,12 @@
 			<version>1.2.14</version>
 			<scope>provided</scope>
 		</dependency>
+		<dependency>
+			<groupId>commons-logging</groupId>
+			<artifactId>commons-logging</artifactId>
+			<version>1.1</version>
+			<scope>provided</scope>
+		</dependency>
 		<!-- General dependencies for standard applications -->
 		<dependency>
 			<groupId>org.junit</groupId>
@@ -99,6 +105,11 @@
 			<groupId>org.springframework.extensions.surf</groupId>
 			<artifactId>spring-webscripts-addon-groovy-cr</artifactId>
 			<version>${spring.surf.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>de.contentreich</groupId>
+			<artifactId>contentreich-webscripts</artifactId>
+			<version>1.0</version>
 		</dependency>
         <dependency>
             <groupId>tk.skuro.spring.surf.clojure</groupId>
@@ -144,21 +155,24 @@
 			<groupId>org.alfresco</groupId>
 			<artifactId>alfresco-core</artifactId>
 			<version>${alfresco.version}</version>
-			<!--classifier>${alfresco.edition}</classifier-->
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.alfresco</groupId>
 			<artifactId>alfresco-repository</artifactId>
 			<version>${alfresco.version}</version>
-			<!--classifier>${alfresco.edition}</classifier-->
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.alfresco</groupId>
 			<artifactId>alfresco-data-model</artifactId>
 			<version>${alfresco.version}</version>
-			<!--classifier>${alfresco.edition}</classifier-->
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.alfresco</groupId>
+			<artifactId>alfresco-remote-api</artifactId>
+			<version>${alfresco.version}</version>
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>

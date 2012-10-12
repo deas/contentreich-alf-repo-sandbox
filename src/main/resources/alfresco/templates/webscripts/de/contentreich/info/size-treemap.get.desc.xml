@@ -1,9 +1,0 @@
-<webscript>
-  <shortname>node-size</shortname>
-  <description>Node Size</description>
-  <url>/contentreich/info/size-treemap/{id}?maxdepth={maxdepth}</url>
-  <format default="json">argument</format>
-  <authentication>user</authentication>
-  <transaction>required</transaction>
-  <lifecycle>internal</lifecycle>
-</webscript>
